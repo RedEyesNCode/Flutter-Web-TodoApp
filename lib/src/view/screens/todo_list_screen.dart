@@ -35,12 +35,37 @@ class _TodoListScreenState extends State<TodoListScreen> {
     // --- Data Fetching ---
     if (viewModel.allTodoResponse == null) {
       viewModel.getAllTodoItems(); // Trigger data fetching if not already loaded
-      return const Center(child: CircularProgressIndicator());
+      return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              children: [
+                const Text('Flutter Web Todo App'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(onPressed: () => {showCreateTodoDialog(context, viewModel)}, child: Text('Create Todo Item')),
+                )
+              ],
+            ),
+          ),
+          body:Center(child: Text(viewModel.allTodoResponse!.message!)));
     }
 
     // --- Error Handling ---
     if (viewModel.allTodoResponse!.status == "fail") {
-      return Center(child: Text(viewModel.allTodoResponse!.message!));
+           return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              children: [
+                const Text('Flutter Web Todo App'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(onPressed: () => {showCreateTodoDialog(context, viewModel)}, child: Text('Create Todo Item')),
+                )
+              ],
+            ),
+          ),
+          body:Center(child: Text(viewModel.allTodoResponse!.message!)));
+
     }
 
     // --- List Building ---
@@ -207,9 +232,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   child: const Text("Close"),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-
+                  onPressed: () async {
+                    await _initialApiCall(viewModel);
                     // Call your ViewModel to update the todo item with new values
                     viewModel.updateTodoItem({
                       "id": todoItem.id.toString(),
@@ -217,6 +241,11 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       "description": descriptionController.text,
                       "completed": isCompleted,
                     }, todoItem.id.toString());
+                    Navigator.of(context).pop();
+
+
+
+
                   },
                   child: const Text("Update"),
                 ),
@@ -272,14 +301,15 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 child: const Text("Close"),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
+                onPressed: () async {
+                  await _initialApiCall(viewModel);
                   viewModel.createTodoItem({
                     "title" : titleController.text.toString(),
                     "description" : descriptionController.text.toString(),
                     "completed" : isCompleted
                   }); // Call the actual creation method
-                  _initialApiCall(viewModel);
+
+                  Navigator.of(context).pop();
 
                 },
                 child: const Text("Create"),

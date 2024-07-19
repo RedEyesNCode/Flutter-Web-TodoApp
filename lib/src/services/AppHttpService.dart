@@ -19,7 +19,10 @@ class AppHttpService extends BaseService {
 
         return responseJson;
       case 400:
-        throw BadRequestException(response.body.toString());
+        dynamic responseJson = jsonDecode(response.body);
+        print(responseJson);
+
+        return responseJson;
       case 401:
       case 403:
         throw UnauthorisedException(response.body.toString());
